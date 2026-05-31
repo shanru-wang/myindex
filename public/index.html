@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A browser-based multi-market portfolio tracker for Cloudflare Pages."
+    />
+    <title>Northstar Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">N</div>
+          <div>
+            <p>Northstar</p>
+            <span>Portfolio studio</span>
+          </div>
+        </div>
+
+        <nav class="main-nav" aria-label="Primary navigation">
+          <button class="nav-item active" data-view="overview">
+            <span class="nav-icon">⌂</span><span>Overview</span>
+          </button>
+          <button class="nav-item" data-view="holdings">
+            <span class="nav-icon">▤</span><span>Holdings</span>
+          </button>
+          <button class="nav-item" data-view="combinations">
+            <span class="nav-icon">◈</span><span>Combinations</span>
+          </button>
+          <button class="nav-item" data-view="markets">
+            <span class="nav-icon">◎</span><span>Markets</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-lower">
+          <div class="currency-switch">
+            <p>Display currency</p>
+            <button class="currency-pill active">USD</button>
+            <button class="currency-pill">HKD</button>
+            <button class="currency-pill">CNY</button>
+          </div>
+          <div class="profile">
+            <div class="avatar">SW</div>
+            <div>
+              <strong>My portfolio</strong>
+              <span>Private workspace</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow" id="today-label"></p>
+            <h1>Portfolio overview</h1>
+          </div>
+          <div class="topbar-actions">
+            <div class="market-status"><i></i> Market data demo</div>
+            <button class="icon-button" aria-label="Notifications">♧</button>
+            <button class="primary-button" id="open-stock-picker">
+              <span>+</span> Add stock
+            </button>
+          </div>
+        </header>
+
+        <section class="hero-grid">
+          <article class="balance-card">
+            <div class="card-topline">
+              <span>Total portfolio value</span>
+              <button class="ghost-icon" aria-label="Portfolio information">ⓘ</button>
+            </div>
+            <div class="balance-line">
+              <h2 id="total-value">$0</h2>
+              <span class="trend-tag" id="total-return-percent">+0.00%</span>
+            </div>
+            <p class="balance-subline">
+              <span id="total-return-value">+$0</span>
+              <span>total return</span>
+            </p>
+            <div class="sparkline-wrap">
+              <svg viewBox="0 0 580 105" preserveAspectRatio="none" aria-label="Portfolio value trend">
+                <defs>
+                  <linearGradient id="spark-fill" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#d86142" stop-opacity=".2" />
+                    <stop offset="100%" stop-color="#d86142" stop-opacity="0" />
+                  </linearGradient>
+                </defs>
+                <path class="spark-fill" d="M0 83 C 45 65, 72 79, 112 53 S 172 50, 212 58 S 277 33, 318 42 S 375 20, 408 31 S 473 25, 510 10 S 552 16, 580 4 L580 105 L0 105 Z" />
+                <path class="spark-line" d="M0 83 C 45 65, 72 79, 112 53 S 172 50, 212 58 S 277 33, 318 42 S 375 20, 408 31 S 473 25, 510 10 S 552 16, 580 4" />
+              </svg>
+              <div class="chart-labels"><span>JAN</span><span>FEB</span><span>MAR</span><span>APR</span><span>MAY</span></div>
+            </div>
+          </article>
+
+          <article class="allocation-card">
+            <div class="card-heading">
+              <div>
+                <p class="eyebrow">Diversification</p>
+                <h3>Market allocation</h3>
+              </div>
+              <button class="ghost-icon" aria-label="More options">•••</button>
+            </div>
+            <div class="allocation-layout">
+              <div class="donut" id="allocation-donut">
+                <div><strong id="market-count">0</strong><span>markets</span></div>
+              </div>
+              <div class="allocation-legend" id="allocation-legend"></div>
+            </div>
+          </article>
+        </section>
+
+        <section class="metric-row" aria-label="Portfolio metrics">
+          <article class="metric-card">
+            <p>Invested capital</p>
+            <strong id="invested-value">$0</strong>
+            <span id="holding-count">0 holdings</span>
+          </article>
+          <article class="metric-card">
+            <p>Today's movement</p>
+            <strong class="positive" id="day-movement">+$0</strong>
+            <span id="day-movement-percent">+0.00% since open</span>
+          </article>
+          <article class="metric-card">
+            <p>Best performer</p>
+            <strong id="best-performer">—</strong>
+            <span class="positive" id="best-performer-return">No holdings yet</span>
+          </article>
+          <article class="metric-card">
+            <p>Saved combinations</p>
+            <strong id="combination-count">0</strong>
+            <span>Custom watchlists</span>
+          </article>
+        </section>
+
+        <section class="content-grid">
+          <article class="holdings-panel">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Positions</p>
+                <h3>Your holdings</h3>
+              </div>
+              <div class="section-actions">
+                <label class="search-field compact">
+                  <span>⌕</span>
+                  <input id="holding-search" type="search" placeholder="Filter holdings" />
+                </label>
+                <button class="secondary-button" id="open-stock-picker-secondary">+ Add</button>
+              </div>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Stock</th>
+                    <th>Shares</th>
+                    <th>Avg. cost</th>
+                    <th>Price</th>
+                    <th>Market value</th>
+                    <th>Return</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="holdings-body"></tbody>
+              </table>
+            </div>
+          </article>
+
+          <aside class="combination-panel">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Curated lists</p>
+                <h3>Combinations</h3>
+              </div>
+              <button class="square-button" id="open-combination-modal" aria-label="Create combination">+</button>
+            </div>
+            <div class="combination-list" id="combination-list"></div>
+          </aside>
+        </section>
+
+        <footer class="site-footer">
+          <span>Local-first portfolio workspace</span>
+          <span>Prices are sample data for demonstration</span>
+        </footer>
+      </main>
+    </div>
+
+    <dialog id="stock-picker" class="modal">
+      <div class="modal-inner large-modal">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Stock universe</p>
+            <h2>Add a holding</h2>
+            <span>Search across Hong Kong, New York, Nasdaq, Shanghai and Shenzhen.</span>
+          </div>
+          <button class="close-button" data-close="stock-picker" aria-label="Close">×</button>
+        </div>
+        <label class="search-field stock-search">
+          <span>⌕</span>
+          <input id="stock-search" type="search" placeholder="Search by company or ticker..." autofocus />
+        </label>
+        <div class="exchange-filters" id="exchange-filters"></div>
+        <div class="catalog-status" id="catalog-status">Loading exchange catalogs…</div>
+        <div class="stock-results" id="stock-results"></div>
+      </div>
+    </dialog>
+
+    <dialog id="holding-editor" class="modal">
+      <form id="holding-form" class="modal-inner form-modal">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Position details</p>
+            <h2 id="holding-form-title">Update holding</h2>
+            <span id="holding-form-subtitle"></span>
+          </div>
+          <button class="close-button" type="button" data-close="holding-editor" aria-label="Close">×</button>
+        </div>
+        <input id="holding-symbol" type="hidden" />
+        <label class="form-control">
+          <span>Number of shares</span>
+          <input id="holding-shares" type="number" min="0" step="0.01" required />
+        </label>
+        <label class="form-control">
+          <span>Average cost per share</span>
+          <input id="holding-cost" type="number" min="0" step="0.01" required />
+        </label>
+        <div class="form-footer">
+          <button class="danger-link" id="remove-holding" type="button">Remove holding</button>
+          <button class="primary-button" type="submit">Save position</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="combination-modal" class="modal">
+      <form id="combination-form" class="modal-inner form-modal combination-form">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Curated list</p>
+            <h2>Create combination</h2>
+            <span>Group companies into a theme you want to follow.</span>
+          </div>
+          <button class="close-button" type="button" data-close="combination-modal" aria-label="Close">×</button>
+        </div>
+        <label class="form-control">
+          <span>Combination name</span>
+          <input id="combination-name" maxlength="28" placeholder="e.g. China consumer" required />
+        </label>
+        <div class="combination-choices">
+          <span>Select stocks</span>
+          <div id="combination-choices"></div>
+        </div>
+        <div class="form-footer right">
+          <button class="primary-button" type="submit">Create combination</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
